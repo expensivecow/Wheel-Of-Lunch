@@ -6,6 +6,9 @@ var restaurants = [{name:"Wendy's", lat:"", lng:"", vicinity:""}, {name:"McDonal
 	                {name:"Arby's", lat:"", lng:"", vicinity:""}, {name:"Indian", lat:"", lng:"", vicinity:""}];
 
 $(document).ready(function() {
+    var isDragging = false;
+    var rotation = 0;
+
 	drawRouletteWheel();
 
 	if(params.length > 0){
@@ -40,6 +43,20 @@ $(document).ready(function() {
 	});
 	$('button#spin').click(function() {
 		spin();
+	});
+	$('#wheel').mousedown(function() {
+		isDragging = true;
+	}).mouseup(function() {
+		isDragging = false;
+	}).mouseout(function() {
+		isDragging = false;
+	}).mousemove(function() {
+		if(isDragging) {
+			spin();
+			isDragging = false;
+		} else {
+			isDragging = false;
+		}
 	});
 	$('canvas#confetti-world').click(function() {
 		proceed();
