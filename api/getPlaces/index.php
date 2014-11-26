@@ -3,7 +3,7 @@
 class PlacesAPI {
 	
 	private $baseURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
-	private $apiKey = "AIzaSyCGjVkAtfdNT6aWKb_cheGZDFMWid4g0Pw";
+	private $apiKey = "AIzaSyAzFWdt81gY3Kzk-PHskUW9F0X_eOAYZWY";
 	
 	public function getPlaces($latitude, $longitude, $radius, $type, $maxPlaces, $minPrice, $maxPrice) {
 		
