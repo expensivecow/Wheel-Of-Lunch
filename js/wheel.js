@@ -113,7 +113,7 @@ function stopRotateWheel() {
 	$('.result h2').html(restaurants[index].name);
 	$('.result p.vicinity').html(restaurants[index].vicinity);
 	$('.result p.rating').html((restaurants[index].rating));
-	console.log(restaurants[index].rating);
+	console.log(restaurants[index].place_id);
 	$('.result a.map').attr("href", mapURL + originCoords + "/" + resultName + "," + restaurants[index].vicinity + "/@" + restaurants[index].lat + "," + restaurants[index].lng);
 	
 	ctx.restore();
