@@ -15,7 +15,7 @@ function getPlacesAjax(latitude, longitude, radius, placeType, maxPlaces) {
 	restaurants = new Array(maxPlaces);
 	
 //	$.getJSON( "/wheel/api/getPlaces/?" + 
-	$.getJSON( "http://eece310-group16.co.nf//wheel/api/getPlaces/?"  +
+	$.getJSON( "http://eece310-group16.co.nf/wheel/api/getPlaces/?"  +
 				"latitude=" + latitude + "&" +
 				"longitude=" + longitude + "&" + 
 				"radius=" + radius + "&" +
