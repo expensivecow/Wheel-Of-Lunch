@@ -7,14 +7,8 @@ var restaurants = [{name:"Wendy's", lat:"", lng:"", vicinity:""}, {name:"McDonal
 
 $(document).ready(function() {
     var isDragging = false;
-    var originX = $('button#spin').offset().left;
-    var originY = $('button#spin').offset().top;
 	var clickedX, clickedY, releasedX, releasedY, draggingX, draggingY;
-	var angleRad;
-	var lastAngle;
-	var target_wp;
-	var angleDegree;
-	var s_rad = 0;
+	var angleRad = 0;
 
 	drawRouletteWheel();
 
@@ -57,22 +51,20 @@ $(document).ready(function() {
 		isDragging = true;
 	})
 	$('#wheel').mousemove(function(e) {
-		if(isDragging) {
+		if(isDragging && !retIsSpinning()) {
 			draggingX = e.pageX;
 			draggingY = e.pageY;
 
-			s_rad = Math.atan2(draggingY - $('button#spin').offset().top, draggingX - $('button#spin').offset().left);
+			angleRad = Math.atan2(draggingY - $('button#spin').offset().top, draggingX - $('button#spin').offset().left);
 
-			s_rad -= Math.atan2(clickedY - $('button#spin').offset().top, clickedX - $('button#spin').offset().left)
-			
-			addToStartAngle(s_rad/25);
+			angleRad -= Math.atan2(clickedY - $('button#spin').offset().top, clickedX - $('button#spin').offset().left)
+
+			addToStartAngle(angleRad/25); //make the wheel slower perceptively
 			drawRouletteWheel();
 		} 
 	});
 	$('#wheel').mouseup(function(e) {
-		releasedX = e.pageX;
-		releasedY = e.pageY;
-		if(s_rad > 1.25) { // a minimum delta of rad = 1.25 required to drag around the wheel to count as a 'spin' 
+		if(angleRad >= 1.25 && !retIsSpinning()) { // a minimum delta of rad = 1.25 required to drag around the wheel to count as a 'spin' 
 			spin();
 		}
 		isDragging = false;

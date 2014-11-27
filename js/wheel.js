@@ -9,6 +9,7 @@ var width = 600;
 var height = 600;
 var halfWidth = width / 2;
 var halfHeight = width / 2;
+var isSpinning = false;
 
 var startAngle = 0;
 var arc = Math.PI / (restaurants.length / 2);
@@ -81,13 +82,21 @@ function spin() {
 	spinTime = 0;
 	spinTimeTotal = Math.random() * 3 + 4 * spinVelocity;
 	closeSettings();
-	rotateWheel();
+	if(isSpinning == false) {
+		isSpinning = true;
+		rotateWheel();
+	}
+}
+
+function retIsSpinning() {
+	return isSpinning;
 }
 
 function rotateWheel() {
 	spinTime += 30;
 	if(spinTime >= spinTimeTotal) {
 		stopRotateWheel();
+		isSpinning = false; // to indicate the wheel has stopped spinning
 		return;
 	}
 	var spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
