@@ -57,6 +57,7 @@ class PlacesAPI {
 	
 }
 
+header('Access-Control-Allow-Origin: http://expensivecow.github.io');
 $api = new PlacesAPI;
 $api -> getPlaces($_GET['latitude'],
 				  $_GET['longitude'],
