@@ -7,7 +7,14 @@ var restaurants = [{name:"Wendy's", lat:"", lng:"", vicinity:""}, {name:"McDonal
 
 $(document).ready(function() {
     var isDragging = false;
-    var rotation = 0;
+    var originX = $('button#spin').offset().left;
+    var originY = $('button#spin').offset().top;
+	var clickedX, clickedY, releasedX, releasedY, draggingX, draggingY;
+	var angleRad;
+	var lastAngle;
+	var target_wp;
+	var angleDegree;
+	var s_rad = 0;
 
 	drawRouletteWheel();
 
@@ -44,19 +51,34 @@ $(document).ready(function() {
 	$('button#spin').click(function() {
 		spin();
 	});
-	$('#wheel').mousedown(function() {
+	$('#wheel').mousedown(function(e) {
+		clickedX = e.pageX;
+		clickedY = e.pageY;
 		isDragging = true;
-	}).mouseup(function() {
-		isDragging = false;
-	}).mouseout(function() {
-		isDragging = false;
-	}).mousemove(function() {
+	})
+	$('#wheel').mousemove(function(e) {
 		if(isDragging) {
+			draggingX = e.pageX;
+			draggingY = e.pageY;
+
+			s_rad = Math.atan2(draggingY - $('button#spin').offset().top, draggingX - $('button#spin').offset().left);
+
+			s_rad -= Math.atan2(clickedY - $('button#spin').offset().top, clickedX - $('button#spin').offset().left)
+			
+			addToStartAngle(s_rad/25);
+			drawRouletteWheel();
+		} 
+	});
+	$('#wheel').mouseup(function(e) {
+		releasedX = e.pageX;
+		releasedY = e.pageY;
+		if(s_rad > 1.25) { // a minimum delta of rad = 1.25 required to drag around the wheel to count as a 'spin' 
 			spin();
-			isDragging = false;
-		} else {
-			isDragging = false;
 		}
+		isDragging = false;
+	});
+	$('#wheel').mouseout(function(e) {
+		isDragging = false;
 	});
 	$('canvas#confetti-world').click(function() {
 		proceed();

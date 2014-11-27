@@ -129,6 +129,14 @@ function easeOut(t, b, c, d) {
 	return b+c*(tc + -3*ts + 3*t);
 }
 
+function addToStartAngle(angle) {
+	startAngle += angle;
+}
+
+function getStartAngle() {
+	return startAngle;
+}
+
 function printAt(context, text, x, y, lineHeight, fitWidth)
 {
     fitWidth = fitWidth || 0;
