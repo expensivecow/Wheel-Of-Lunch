@@ -3,7 +3,7 @@
 class PlacesAPI {
 	
 	private $baseURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
-	private $apiKey = "AIzaSyAzFWdt81gY3Kzk-PHskUW9F0X_eOAYZWY";
+	private $apiKey = "AIzaSyCGjVkAtfdNT6aWKb_cheGZDFMWid4g0Pw";
 	
 	public function getPlaces($latitude, $longitude, $radius, $type, $maxPlaces, $minPrice, $maxPrice) {
 		
@@ -38,6 +38,7 @@ class PlacesAPI {
 			$places[$i]['lat'] = $results[$i]['geometry']['location']['lat'];
 			$places[$i]['lng'] = $results[$i]['geometry']['location']['lng'];
 			$places[$i]['vicinity'] = $results[$i]['vicinity'];
+			$places[$i]['rating'] = $results[$i]['rating'];
 			$i++;
 		}
 		
@@ -57,7 +58,6 @@ class PlacesAPI {
 	
 }
 
-header('Access-Control-Allow-Origin: http://expensivecow.github.io');
 $api = new PlacesAPI;
 $api -> getPlaces($_GET['latitude'],
 				  $_GET['longitude'],
