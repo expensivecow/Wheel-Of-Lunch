@@ -7,8 +7,9 @@ var restaurants = [{name:"Wendy's", lat:"", lng:"", vicinity:""}, {name:"McDonal
 
 $(document).ready(function() {
     var isDragging = false;
-	var clickedX, clickedY, releasedX, releasedY, draggingX, draggingY;
-	var angleRad = 0;
+	var previousDragX, previousDragY, currentDragX, currentDragY, clickedX, clickedY;
+	var arcAngle = 0;
+	var changedAngle = 0;
 
 	drawRouletteWheel();
 
@@ -46,25 +47,39 @@ $(document).ready(function() {
 		spin();
 	});
 	$('#wheel').mousedown(function(e) {
+		//set up the first instance of previous drag
+		previousDragX = e.pageX;
+		previousDragY = e.pageY;
 		clickedX = e.pageX;
 		clickedY = e.pageY;
 		isDragging = true;
 	})
 	$('#wheel').mousemove(function(e) {
 		if(isDragging && !retIsSpinning()) {
-			draggingX = e.pageX;
-			draggingY = e.pageY;
+			currentDragX = e.pageX;
+			currentDragY = e.pageY;
 
-			angleRad = Math.atan2(draggingY - $('button#spin').offset().top, draggingX - $('button#spin').offset().left);
+			//finding the movement from the last drag
+			changedAngle = Math.atan2(currentDragY - $('button#spin').position().top, currentDragX - $('button#spin').position().left);
+			changedAngle -= Math.atan2(previousDragY - $('button#spin').position().top, previousDragX - $('button#spin').position().left);
 
-			angleRad -= Math.atan2(clickedY - $('button#spin').offset().top, clickedX - $('button#spin').offset().left)
+			//recalculating the arc from when the mouse was firsted click -- used to indicate a 'spin'
+			arcAngle = Math.atan2(currentDragY - $('button#spin').position().top, currentDragX - $('button#spin').position().left);
+			arcAngle -= Math.atan2(clickedY - $('button#spin').position().top, clickedX - $('button#spin').position().left);
 
-			addToStartAngle(angleRad/25); //make the wheel slower perceptively
+			console.log(arcAngle); // amount of radians the move is dragged
+
+			//add whatever the angle has changed by from the last movement of the mouse
+			addToStartAngle(changedAngle);
 			drawRouletteWheel();
+
+			//update the previous with the current coordinate of the mouse
+			previousDragY = currentDragY;
+			previousDragX = currentDragX;
 		} 
 	});
 	$('#wheel').mouseup(function(e) {
-		if(angleRad >= 1.25 && !retIsSpinning()) { // a minimum delta of rad = 1.25 required to drag around the wheel to count as a 'spin' 
+		if(arcAngle >= 1.25 && !retIsSpinning()) { // a minimum delta of rad = 1.25 required to drag around the wheel to count as a 'spin' 
 			spin();
 		}
 		isDragging = false;
