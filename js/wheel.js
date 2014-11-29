@@ -77,14 +77,17 @@ function drawRouletteWheel() {
 	}
 }
 
-function spin() {	
+function spin(isForwards) {	
 	spinAngleStart = Math.random() * 10 + 10;
 	spinTime = 0;
 	spinTimeTotal = Math.random() * 3 + 4 * spinVelocity;
 	closeSettings();
-	if(isSpinning == false) {
+	if(isSpinning == false && isForwards) {
 		isSpinning = true;
-		rotateWheel();
+		rotateWheel(true);
+	} else if (isSpinning == false && !isForwards) {
+		isSpinning = true;
+		rotateWheel(false);
 	}
 }
 
@@ -92,28 +95,39 @@ function retIsSpinning() {
 	return isSpinning;
 }
 
-function rotateWheel() {
+function rotateWheel(isForwards) {
 	spinTime += 30;
+	console.log(startAngle);
 	if(spinTime >= spinTimeTotal) {
 		stopRotateWheel();
 		isSpinning = false; // to indicate the wheel has stopped spinning
 		return;
 	}
 	var spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
-	startAngle += (spinAngle * Math.PI / 180);
+	if(isForwards) {
+		startAngle += (spinAngle * Math.PI / 180);
+	} else {	
+		startAngle -= (spinAngle * Math.PI / 180);
+	}
 	drawRouletteWheel();
 	spinTimeout = setTimeout(function() { 
-		rotateWheel();	
+		rotateWheel(isForwards);	
 	}, 30);
 }
 
 function stopRotateWheel() {
 	clearTimeout(spinTimeout);
 	var degrees = startAngle * 180 / Math.PI + 90;
+	degrees = Math.abs(degrees);
 	var arcd = arc * 180 / Math.PI;
 	var index = Math.floor((360 - degrees % 360) / arcd);
 	ctx.save();
-	
+
+	console.log("degrees: " + degrees);
+	console.log("arcd: " + arcd);
+	console.log("index: " + index);
+	console.log("startAngle: " + startAngle);
+
 	var resultName = restaurants[index].name.split(' ').join('+');
 	var mapURL = "http://maps.google.com/maps/dir/"; 
 	var originCoords = $('#latitude').val() + "," + $('#longitude').val();

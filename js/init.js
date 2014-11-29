@@ -44,14 +44,16 @@ $(document).ready(function() {
 		initLocation();
 	});
 	$('button#spin').click(function() {
-		spin();
+		if(!retIsSpinning()) {
+			spin(false); // true indicates to spin clockwise
+		}
 	});
 	$('#wheel').mousedown(function(e) {
+		clickedX = e.pageX;
+		clickedY = e.pageY;
 		//set up the first instance of previous drag
 		previousDragX = e.pageX;
 		previousDragY = e.pageY;
-		clickedX = e.pageX;
-		clickedY = e.pageY;
 		isDragging = true;
 	})
 	$('#wheel').mousemove(function(e) {
@@ -80,7 +82,9 @@ $(document).ready(function() {
 	});
 	$('#wheel').mouseup(function(e) {
 		if(arcAngle >= 1.25 && !retIsSpinning()) { // a minimum delta of rad = 1.25 required to drag around the wheel to count as a 'spin' 
-			spin();
+			spin(true);
+		} else if(arcAngle <= -1.25 && !retIsSpinning()) {
+			spin(false); 
 		}
 		isDragging = false;
 	});
