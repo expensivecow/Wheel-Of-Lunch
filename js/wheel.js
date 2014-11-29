@@ -77,15 +77,15 @@ function drawRouletteWheel() {
 	}
 }
 
-function spin(isForwards) {	
+function spin(isForward) {	
 	spinAngleStart = Math.random() * 10 + 10;
 	spinTime = 0;
 	spinTimeTotal = Math.random() * 3 + 4 * spinVelocity;
 	closeSettings();
-	if(isSpinning == false && isForwards) {
+	if(isSpinning == false && isForward) {
 		isSpinning = true;
 		rotateWheel(true);
-	} else if (isSpinning == false && !isForwards) {
+	} else if (isSpinning == false && !isForward) {
 		isSpinning = true;
 		rotateWheel(false);
 	}
@@ -95,38 +95,36 @@ function retIsSpinning() {
 	return isSpinning;
 }
 
-function rotateWheel(isForwards) {
+function rotateWheel(isForward) {
 	spinTime += 30;
-	console.log(startAngle);
 	if(spinTime >= spinTimeTotal) {
 		stopRotateWheel();
 		isSpinning = false; // to indicate the wheel has stopped spinning
 		return;
 	}
 	var spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
-	if(isForwards) {
+	if(isForward) {
 		startAngle += (spinAngle * Math.PI / 180);
 	} else {	
 		startAngle -= (spinAngle * Math.PI / 180);
 	}
 	drawRouletteWheel();
 	spinTimeout = setTimeout(function() { 
-		rotateWheel(isForwards);	
+		rotateWheel(isForward);	
 	}, 30);
 }
 
 function stopRotateWheel() {
 	clearTimeout(spinTimeout);
 	var degrees = startAngle * 180 / Math.PI + 90;
-	degrees = Math.abs(degrees);
 	var arcd = arc * 180 / Math.PI;
 	var index = Math.floor((360 - degrees % 360) / arcd);
 	ctx.save();
 
-	console.log("degrees: " + degrees);
-	console.log("arcd: " + arcd);
-	console.log("index: " + index);
-	console.log("startAngle: " + startAngle);
+	if(degrees < 0) { // the wheel was reversing and the startAngle is now negative
+		degrees = Math.abs(degrees);
+		index = Math.floor((degrees % 360) / arcd);
+	}
 
 	var resultName = restaurants[index].name.split(' ').join('+');
 	var mapURL = "http://maps.google.com/maps/dir/"; 

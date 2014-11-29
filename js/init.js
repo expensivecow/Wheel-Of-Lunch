@@ -69,7 +69,6 @@ $(document).ready(function() {
 			arcAngle = Math.atan2(currentDragY - $('button#spin').position().top, currentDragX - $('button#spin').position().left);
 			arcAngle -= Math.atan2(clickedY - $('button#spin').position().top, clickedX - $('button#spin').position().left);
 
-			console.log(arcAngle); // amount of radians the move is dragged
 
 			//add whatever the angle has changed by from the last movement of the mouse
 			addToStartAngle(changedAngle);
@@ -81,11 +80,11 @@ $(document).ready(function() {
 		} 
 	});
 	$('#wheel').mouseup(function(e) {
-		if((arcAngle >= 1.25) && !retIsSpinning() && changedAngle > 0) { // a minimum delta of rad = 1.25 required to drag around the wheel to count as a 'spin' 
+		if((arcAngle >= 0.5) && !retIsSpinning() && changedAngle > 0) { // a minimum delta of rad = 0.5 required to drag around the wheel to count as a 'spin' 
 			spin(true); 
 		} else if((arcAngle < -4) && !retIsSpinning() && changedAngle > 0) {
 			spin(true);
-		} else if((arcAngle <= -1.25) && !retIsSpinning() && changedAngle < 0) {
+		} else if((arcAngle <= -0.5) && !retIsSpinning() && changedAngle < 0) {
 			spin(false);
 		} else if((arcAngle > 4) && !retIsSpinning() && changedAngle < 0) {
 			spin(false);
