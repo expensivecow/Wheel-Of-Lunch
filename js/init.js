@@ -7,14 +7,9 @@ var restaurants = [{name:"Wendy's", lat:"", lng:"", vicinity:""}, {name:"McDonal
 
 $(document).ready(function() {
     var isDragging = false;
-    var originX = $('button#spin').offset().left;
-    var originY = $('button#spin').offset().top;
-	var clickedX, clickedY, releasedX, releasedY, draggingX, draggingY;
-	var angleRad;
-	var lastAngle;
-	var target_wp;
-	var angleDegree;
-	var s_rad = 0;
+	var previousDragX, previousDragY, currentDragX, currentDragY, clickedX, clickedY;
+	var arcAngle = 0;
+	var changedAngle = 0;
 
 	drawRouletteWheel();
 
@@ -49,32 +44,52 @@ $(document).ready(function() {
 		initLocation();
 	});
 	$('button#spin').click(function() {
-		spin();
+		if(!rouletteWheel.retIsSpinning()) {
+			rouletteWheel.spin(true);
+		}
 	});
 	$('#wheel').mousedown(function(e) {
 		clickedX = e.pageX;
 		clickedY = e.pageY;
+		//set up the first instance of previous drag
+		previousDragX = e.pageX;
+		previousDragY = e.pageY;
 		isDragging = true;
 	})
 	$('#wheel').mousemove(function(e) {
-		if(isDragging) {
-			draggingX = e.pageX;
-			draggingY = e.pageY;
+		if(isDragging && !retIsSpinning()) {
+			currentDragX = e.pageX;
+			currentDragY = e.pageY;
 
-			s_rad = Math.atan2(draggingY - $('button#spin').offset().top, draggingX - $('button#spin').offset().left);
+			//finding the movement from the last drag
+			changedAngle = Math.atan2(currentDragY - $('button#spin').position().top, currentDragX - $('button#spin').position().left);
+			changedAngle -= Math.atan2(previousDragY - $('button#spin').position().top, previousDragX - $('button#spin').position().left);
 
-			s_rad -= Math.atan2(clickedY - $('button#spin').offset().top, clickedX - $('button#spin').offset().left)
-			
-			addToStartAngle(s_rad/25);
-			drawRouletteWheel();
+			//recalculating the arc from when the mouse was firsted click -- used to indicate a 'spin'
+			arcAngle = Math.atan2(currentDragY - $('#spin').position().top, currentDragX - $('#spin').position().left);
+			arcAngle -= Math.atan2(clickedY - $('#spin').position().top, clickedX - $('#spin').position().left);
+
+			//console.log(changedAngle);
+
+			//add whatever the angle has changed by from the last movement of the mouse
+			addToStartAngle(changedAngle);
+			drawRouletteWheel(true);
+
+			//update the previous with the current coordinate of the mouse
+			previousDragY = currentDragY;
+			previousDragX = currentDragX;
 		} 
 	});
 	$('#wheel').mouseup(function(e) {
-		releasedX = e.pageX;
-		releasedY = e.pageY;
-		if(s_rad > 1.25) { // a minimum delta of rad = 1.25 required to drag around the wheel to count as a 'spin' 
-			spin();
-		}
+		if((arcAngle >= 0.5) && !retIsSpinning() && changedAngle > 0) { // a minimum delta of rad = 0.5 required to drag around the wheel to count as a 'spin' 
+			spin(true);
+		} else if((arcAngle < -4) && !retIsSpinning() && changedAngle > 0) {
+			spin(true);
+		} else if((arcAngle <= -0.5) && !retIsSpinning() && changedAngle < 0) {
+			spin(false);
+		} else if((arcAngle > 4) && !retIsSpinning() && changedAngle < 0) {
+			spin(true);
+		} 
 		isDragging = false;
 	});
 	$('#wheel').mouseout(function(e) {

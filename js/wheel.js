@@ -17,6 +17,7 @@ var spinTimeout = null;
 var spinArcStart = 10;
 var spinTime = 0;
 var spinTimeTotal = 0;
+var isSpinning = false;
 
 var spinVelocity = 2000;
 
@@ -76,27 +77,47 @@ function drawRouletteWheel() {
 	}
 }
 
-function spin() {	
+function spin(isForward) {	
 	spinAngleStart = Math.random() * 10 + 10;
 	spinTime = 0;
 	spinTimeTotal = Math.random() * 3 + 4 * spinVelocity;
 	closeSettings();
-	rotateWheel();
+	if(isSpinning == false && isForward) {
+		isSpinning = true;
+		rotateWheel(true);
+	} else if (isSpinning == false && !isForward) {
+		isSpinning = true;
+		rotateWheel(false);
+	}
 }
 
-function rotateWheel() {
+function rotateWheel(isForward) {
 	spinTime += 30;
 	if(spinTime >= spinTimeTotal) {
 		stopRotateWheel();
+		isSpinning = false;
 		return;
 	}
+	//console.log(isForward);
 	var spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
-	startAngle += (spinAngle * Math.PI / 180);
+	if(isForward) {
+		startAngle += (spinAngle * Math.PI / 180);
+	} else {
+		startAngle -= (spinAngle * Math.PI / 180);
+	}
 	drawRouletteWheel();
 	spinTimeout = setTimeout(function() { 
-		rotateWheel();	
+		rotateWheel(isForward);	
 	}, 30);
 }
+
+function retIsSpinning() {
+	return isSpinning;
+}
+
+function addToStartAngle(angle) {
+	startAngle += angle;
+}	
 
 function stopRotateWheel() {
 	clearTimeout(spinTimeout);
@@ -105,6 +126,11 @@ function stopRotateWheel() {
 	var index = Math.floor((360 - degrees % 360) / arcd);
 	ctx.save();
 	
+	if(degrees < 0) {
+		degrees = Math.abs(degrees);
+		index = Math.floor((degrees % 360) / arcd);
+	}
+
 	var resultName = restaurants[index].name.split(' ').join('+');
 	var mapURL = "http://maps.google.com/maps/dir/"; 
 	var originCoords = $('#latitude').val() + "," + $('#longitude').val();
@@ -113,7 +139,7 @@ function stopRotateWheel() {
 	$('.result h2').html(restaurants[index].name);
 	$('.result p.vicinity').html(restaurants[index].vicinity);
 	$('.result p.rating').html((restaurants[index].rating));
-	console.log(restaurants[index].rating);
+	//console.log(restaurants[index].rating);
 	$('.result a.map').attr("href", mapURL + originCoords + "/" + resultName + "," + restaurants[index].vicinity + "/@" + restaurants[index].lat + "," + restaurants[index].lng);
 	
 	ctx.restore();
