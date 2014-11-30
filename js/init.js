@@ -11,7 +11,7 @@ $(document).ready(function() {
 	var arcAngle = 0;
 	var changedAngle = 0;
 
-	drawRouletteWheel();
+	rouletteWheel.draw();
 
 	if(params.length > 0){
 		initLocation();
@@ -21,31 +21,31 @@ $(document).ready(function() {
 	$('a.settings').click(function() {
 		toggleSettings();
 	});
-	$('button#search, button#settings-search').click(function() {
+	$('#settings-search').click(function() {
 		searchUserDefined();
 	});
-	$('button#location-option-current').click(function() {
+	$('#location-option-current').click(function() {
 		$('.select-localisation').hide();
 		$('.search-localisation').show();
 		initLocation();
 	});
-	$('button#location-option-find').click(function() {		
+	$('#location-option-find').click(function() {		
 		$('.select-localisation').hide();
 		$('.panel-map').show();
 		initialize();
 	});
-	$('button#localistion-failure').click(function() {
+	$('#localistion-failure').click(function() {
 		proceed();
 	});
-	$('button#select-location').click(function() {
-		$('button#select-location').html('<i class="fa fa-refresh fa-spin"></i>');
+	$('#select-location').click(function() {
+		$(this).html('<i class="fa fa-refresh fa-spin"></i>');
 		params.lat = $('#latBox').val();
 		params.long = $('#lngBox').val();
 		initLocation();
 	});
-	$('button#spin').click(function() {
-		if(!retIsSpinning()) {
-			spin(false); // true indicates to spin clockwise
+	$('#spin').click(function() {
+		if(!rouletteWheel.retIsSpinning()) {
+			rouletteWheel.spin(true);
 		}
 	});
 	$('#wheel').mousedown(function(e) {
@@ -57,22 +57,22 @@ $(document).ready(function() {
 		isDragging = true;
 	})
 	$('#wheel').mousemove(function(e) {
-		if(isDragging && !retIsSpinning()) {
+		if(isDragging && !rouletteWheel.retIsSpinning()) {
 			currentDragX = e.pageX;
 			currentDragY = e.pageY;
 
 			//finding the movement from the last drag
-			changedAngle = Math.atan2(currentDragY - $('button#spin').position().top, currentDragX - $('button#spin').position().left);
-			changedAngle -= Math.atan2(previousDragY - $('button#spin').position().top, previousDragX - $('button#spin').position().left);
+			changedAngle = Math.atan2(currentDragY - $('#spin').position().top, currentDragX - $('#spin').position().left);
+			changedAngle -= Math.atan2(previousDragY - $('#spin').position().top, previousDragX - $('#spin').position().left);
 
 			//recalculating the arc from when the mouse was firsted click -- used to indicate a 'spin'
-			arcAngle = Math.atan2(currentDragY - $('button#spin').position().top, currentDragX - $('button#spin').position().left);
-			arcAngle -= Math.atan2(clickedY - $('button#spin').position().top, clickedX - $('button#spin').position().left);
+			arcAngle = Math.atan2(currentDragY - $('#spin').position().top, currentDragX - $('#spin').position().left);
+			arcAngle -= Math.atan2(clickedY - $('#spin').position().top, clickedX - $('#spin').position().left);
 
 
 			//add whatever the angle has changed by from the last movement of the mouse
-			addToStartAngle(changedAngle);
-			drawRouletteWheel();
+			rouletteWheel.addToStartAngle(changedAngle);
+			rouletteWheel.draw(true);
 
 			//update the previous with the current coordinate of the mouse
 			previousDragY = currentDragY;
@@ -80,27 +80,27 @@ $(document).ready(function() {
 		} 
 	});
 	$('#wheel').mouseup(function(e) {
-		if((arcAngle >= 0.5) && !retIsSpinning() && changedAngle > 0) { // a minimum delta of rad = 0.5 required to drag around the wheel to count as a 'spin' 
-			spin(true); 
-		} else if((arcAngle < -4) && !retIsSpinning() && changedAngle > 0) {
-			spin(true);
-		} else if((arcAngle <= -0.5) && !retIsSpinning() && changedAngle < 0) {
-			spin(false);
-		} else if((arcAngle > 4) && !retIsSpinning() && changedAngle < 0) {
-			spin(false);
+		if((arcAngle >= 0.5) && !rouletteWheel.retIsSpinning() && changedAngle > 0) { // a minimum delta of rad = 0.5 required to drag around the wheel to count as a 'spin' 
+			rouletteWheel.spin(true);
+		} else if((arcAngle < -4) && !rouletteWheel.retIsSpinning() && changedAngle > 0) {
+			rouletteWheel.spin(true);
+		} else if((arcAngle <= -0.5) && !rouletteWheel.retIsSpinning() && changedAngle < 0) {
+			rouletteWheel.spin(false);
+		} else if((arcAngle > 4) && !rouletteWheel.retIsSpinning() && changedAngle < 0) {
+			rouletteWheel.spin(false);
 		} 
 		isDragging = false;
 	});
 	$('#wheel').mouseout(function(e) {
 		isDragging = false;
 	});
-	$('canvas#confetti-world').click(function() {
+	$('#confetti-world').click(function() {
 		proceed();
 	});
-	$('input#shareLink').click(function() {
+	$('#shareLink').click(function() {
 		$(this).select();
 	});
-	$('button#new-location').click(function() {
+	$('#new-location').click(function() {
 		reset();
 		params.lat = undefined;
 		params.long = undefined;
@@ -152,21 +152,14 @@ function generateShareLink() {
 }
 
 function createURL() {
-	var url = window.location.href.slice(0, window.location.href.indexOf('?')) + "?";
-	var params = { 'lat': $('#latitude').val(), 
-					'long':  $('#longitude').val(), 
-					'radius': $('#radius').val(),
-					'type' : $('.settings input[type=radio]:checked').val(), 
-					'maxplaces': $('#maxPlaces').val() };
+	var url = window.location.origin + window.location.pathname,
+		params = {
+			lat: $('#latitude').val(),
+			long: $('#longitude').val(),
+			radius: $('#radius').val(),
+			type: $('.settings input[type=radio]:checked').val(),
+			maxplaces: $('#maxPlaces').val()
+		};
 	
-	for(var key in params) {
-		if (params[key].length > 0) {
-			if(url.substr(url.length - 1) == "?") {
-				url += key + "=" + params[key];
-			} else {
-				url += "&" + key + "=" + params[key];
-			}
-		}
-	}
-	return url;	
+	return url + '?' + $.param(params);
 }
