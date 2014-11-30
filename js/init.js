@@ -44,8 +44,8 @@ $(document).ready(function() {
 		initLocation();
 	});
 	$('button#spin').click(function() {
-		if(!rouletteWheel.retIsSpinning()) {
-			rouletteWheel.spin(true);
+		if(!retIsSpinning()) {
+			spin(true);
 		}
 	});
 	$('#wheel').mousedown(function(e) {
