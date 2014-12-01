@@ -138,8 +138,15 @@ function stopRotateWheel() {
 	//Display Result
 	$('.result h2').html(restaurants[index].name);
 	$('.result p.vicinity').html(restaurants[index].vicinity);
-	$('.result p.rating').html((restaurants[index].rating));
 	//console.log(restaurants[index].rating);
+
+	if(restaurants[index].rating == null){
+		var ratingString = "Rating: Unavailable"
+	}
+	else{
+		var ratingString = "Rating: " + (restaurants[index].rating);
+	}
+	$('.result p.rating').html(ratingString);
 	$('.result a.map').attr("href", mapURL + originCoords + "/" + resultName + "," + restaurants[index].vicinity + "/@" + restaurants[index].lat + "," + restaurants[index].lng);
 	
 	ctx.restore();
